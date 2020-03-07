@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="has-navbar-fixed-top">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload</title>
+    <link rel="stylesheet" href="{% static 'css/bulma.min.css' %}">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+<body>
+    <div class="content">
+        <p class="title">Загрузить данные</p>
+        <p class="subtitle">Демо версия поддерживает табличный .csv формат</p>
+        <div class="content">
+            <form id="file_input" enctype="multipart/form-data" action="{% url 'upload' %}" method="post">
+                {% csrf_token %}
+                {{ form.file.errors }}
+                <div class="field">
+                    <div class="file is-info has-name">
+                        <label class="file-label">
+                            {{ form.file }}
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">
+                                    Загрузить
+                                </span>
+                            </span>
+                            <span class="file-name">
+                                Выберите файл для загрузки
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <script>
+                    const fileInput = document.querySelector('#file_input input[type=file]');
+                    fileInput.onchange = () => {
+                        if (fileInput.files.length > 0) {
+                            const fileName = document.querySelector('#file_input .file-name');
+                            fileName.textContent = fileInput.files[0].name;
+                        }
+                    }
+                </script>
+                <div class="field is-grouped is-grouped-right">
+                    <button class="button is-success" type="submit">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
