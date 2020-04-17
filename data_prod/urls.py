@@ -22,6 +22,5 @@ from . import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('data_control/',  include('data_module.urls')),
-    path('upload/',  include('upload_module.urls')),
+    path('data_manage/', include('data_management.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

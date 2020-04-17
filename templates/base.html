@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="has-navbar-fixed-top" lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}DATA platform{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+    <body>
+        {%  block navbar %}
+            <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'img/KFU.png' %}" width="60" height="60">
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_content"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbar_content">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbar_dropdown_data_management"
+                               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Управление данными
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbar_dropdown_data_management">
+                                <a class="dropdown-item" href="{% url 'research-list' %}">Доступные исследования</a>
+                                <a class="dropdown-item" href="#">Доступные наборы данных</a>
+                                <a class="dropdown-item" href="{% url 'create_research' %}">Новое исследование</a>
+                                <a class="dropdown-item" href="{% url 'create_dataset' %}">Новый набор данных</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbar_dropdown_data_analysis"
+                               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Анализ данных
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbar_dropdown_data_analysis">
+                                <a class="dropdown-item" href="#">Провести исследование</a>
+                                <a class="dropdown-item" href="#">История</a>
+                                <a class="dropdown-item" href="#">Отчеты</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Публикации</a>
+                        </li>
+                    </ul>
+                    <a class="btn btn-info my-2 my-sm-0" href="#" style="margin-right: 1%">Документация</a>
+                    <a class="btn btn-outline-danger my-2 my-sm-0" href="#">Выйти</a>
+                </div>
+            </nav>
+        {% endblock navbar %}
+        <div id="content h-100">
+            {% block content %}
+                <div class="container" style="margin-top: 10%">
+                    <div class="jumbotron">
+                        <h1 class="display-4" style="text-align: center">Блок в разработке</h1>
+                    </div>
+                </div>
+            {% endblock content %}
+        </div>
+
+        <footer class="navbar fixed-bottom navbar-light bg-light">
+            <div class="container justify-content-center">
+                <p>
+                    Проект <strong>DATA</strong>, КФУ - ВШ ИТИС. <br>Авторы: Р.В. Багаутдинов, М.М. Абрамский (Научный руководитель).
+                </p>
+            </div>
+        </footer>
+
+        <script src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
+        <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    </body>
+</html>

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container jumbotron bg-dark text-light">
+    <h1 class="h4 text-center">
+        Загрузка данных: {{ dataset.name }}
+    </h1>
+
+    <form id="upoad_form" enctype="multipart/form-data" action="{% url 'upload_data_to_dataset' dataset.id %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroupFileAddon01">Загрузка</span>
+                </div>
+                <div class="custom-file">
+                    {{ form.file }}
+                    <label id="file_name" class="custom-file-label" for="loaded_file">Выберите файл</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                {{ form.file_format }}
+            </div>
+        </div>
+
+        <div class="btn-toolbar mb-2 mb-md-0 justify-content-end">
+            <button class="btn btn-sm btn-primary" type="submit"
+                    title="Загрузить данные в набор">
+                Загрузить
+            </button>
+            <button class="btn btn-sm btn-outline-danger" type="submit" style="margin-left: 10px"
+                    title="Загрузить данные можно будет позже">
+                На главную
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    const fileInput = document.querySelector('#loaded_file');
+    fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+            const fileName = document.querySelector('#file_name');
+            fileName.textContent = fileInput.files[0].name;
+        }
+    }
+</script>
+
+{% endblock content %}

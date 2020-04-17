@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="container jumbotron bg-dark text-light col-7 ">
+        <h1 class="h4 text-center">
+            Презентация: {{ dataset.name }}
+        </h1>
+
+        <div id="data_panel">
+              <div class="table-responsive">
+                <table class="table table-striped table-sm bg-light table-bordered">
+                  <thead>
+                    <tr>
+                        <th style="white-space: nowrap; width: 1%;">Mongo id</th>
+                        {% for header in headers %}
+                            <th style="white-space: nowrap; width: 1%;">{{ header.name }}</th>
+                        {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in first_rows %}
+                        <tr>
+                            {% for val in row.values %}
+                                <td style="white-space: nowrap; width: 1%;">{{ val }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+        </div>
+        <p class="text-left text-info">
+            Всего: {{ n_rows }} записей. Показано первые {{ showed_rows }}
+        </p>
+    </div>
+
+    <div class="container jumbotron bg-dark text-light col-4">
+        <h1 class="h4 text-center">
+            Типы данных
+        </h1>
+
+        <div id="headers_panel">
+            <form id="types_from" enctype="multipart/form-data" action="{% url 'set_dataset_headers_types' dataset.id %}" method="post">
+            {% csrf_token %}
+              <div class="table-responsive" style="height: 640px; overflow: auto">
+                    <table class="table table-striped table-sm bg-light table-bordered">
+                          <thead>
+                            <tr>
+                                <th style="white-space: nowrap; width: 1%;">Заголовок</th>
+                                <th style="white-space: nowrap; width: 1%;">Тип данных</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for header in headers %}
+                                <tr>
+                                    <td style="white-space: nowrap; width: 1%;">{{ header.name }}</td>
+                                    <td style="white-space: nowrap; width: 1%;">
+                                        <select class="form-control" name="header_{{ header.id }}">
+                                            <option value="{{ header.custom_type.id }}">{{ header.custom_type.name }}</option>
+                                            {% for type in custom_types %}
+                                                {% if type.id != header.custom_type.id %}
+                                                    <option value="{{ type.id }}">{{ type.name }}</option>
+                                                {% endif %}
+                                            {% endfor%}
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                    </table>
+              </div>
+
+                <div class="btn-toolbar mb-2 mb-md-0 justify-content-end" style="margin-top: 20px">
+                    <button class="btn btn-sm btn-primary" name="change_data" type="submit"
+                            title="Подтвердить типы">
+                        Загрузить
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" name="return" type="submit" style="margin-left: 10px"
+                            title="Вернуться на главную">
+                        На главную
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    {% if success_message is not None %}
+        <p class="text-left text-info">
+            {{ success_message }}
+        </p>
+    {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

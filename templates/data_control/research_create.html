@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container jumbotron bg-dark text-light">
+    <h1 class="h4 text-center">
+        Создание нового исследования
+    </h1>
+    <form id="dataset_form" enctype="multipart/form-data" action="{% url 'create_research' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.research_name.errors }}
+            <label for="research_name_input">Наименование исследования</label>
+            {{ form.research_name }}
+        </div>
+        <div class="form-group">
+            {{ form.group.errors }}
+            <label for="research_group">Группа исследований</label>
+            {{ form.group }}
+        </div>
+        <div class="form-group">
+            {{ form.description.errors }}
+            <label for="research_description">Описание</label>
+            {{ form.description }}
+        </div>
+
+        <div class="btn-toolbar mb-2 mb-md-0 justify-content-end">
+            <button class="btn btn-sm btn-primary" type="submit"
+                    title="Сохранить пустой набор и перейти на страницу загрузки данных">
+                Сохранить
+            </button>
+            <button class="btn btn-sm btn-outline-danger" type="submit" style="margin-left: 10px">
+                На главную
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

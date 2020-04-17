@@ -39,7 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'data_module',
+    'data_management',
 ]
+
+DATA_CONVERTERS = {
+    'csv': 'csv_converter'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -49,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'crum.CurrentRequestUserMiddleware',
 ]
 
 ROOT_URLCONF = 'data_prod.urls'
@@ -57,7 +63,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'templates/data_upload',
+            'templates',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -86,6 +92,12 @@ DATABASES = {
         'HOST': '',
         'PORT': '5432',
     }
+}
+
+MONGO_CONNECTION = {
+    'host': 'localhost',
+    'port': 27017,
+    'db_name': 'data',
 }
 
 AUTH_USER_MODEL = 'data_module.User'

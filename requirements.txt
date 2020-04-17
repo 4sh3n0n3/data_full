@@ -1,2 +1,4 @@
+pymongo
 Django>=3.0.0
 Pillow==7.0.0
+dask==2.12.0
