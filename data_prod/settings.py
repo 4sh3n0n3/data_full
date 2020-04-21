@@ -40,10 +40,53 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'data_module',
     'data_management',
+    'data_analysis',
 ]
 
 DATA_CONVERTERS = {
-    'csv': 'csv_converter'
+    'csv': 'csv_converter',
+}
+
+ANALYSERS = {
+    'hierarchical_clusterisation': {
+        'name': 'Иерархическая кластеризация',
+        'description': 'Кластеризация данных по выбранным элементам, путем определения\n '
+                       'их близости методом иерархической кластеризации',
+        'module_name': 'hierarchical_clusterisation',
+        'params': {
+            'method': {
+                'field_type': 'select',
+                'label': 'Метод группировки объектов',
+                'options': {
+                    'single': 'Nearest Point Algorithm',
+                    'complete': 'Farthest Point Algorithm or Voor Hees Algorithm',
+                    'average': 'UPGMA algorithm',
+                    'weighted': 'WPGMA algorithm',
+                    'centroid': 'UPGMC algorithm',
+                    'median': 'WPGMC algorithm',
+                    'ward': 'Incremental algorithm',
+                }
+            },
+            'metric': {
+                'field_type': 'select',
+                'label': 'Метод подсчета дистанции',
+                'options': {
+                    'euclidean': 'Метод Евклида',
+                    'hamming': 'Метод Хэмминга',
+                }
+            },
+        },
+    },
+    'k_means': {
+        'name': 'К - ближайших',
+        'description': 'Кластеризация данных по выбранным элементам, путем определения\n '
+                       '(k) ближайших соседних элементов',
+        'module_name': 'k_means',
+
+        'params': {
+
+        },
+    },
 }
 
 MIDDLEWARE = [

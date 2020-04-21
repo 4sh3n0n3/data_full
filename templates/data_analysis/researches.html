@@ -1,0 +1,61 @@
+{% extends 'data_analysis/analysis_base.html' %}
+{% load static %}
+
+{% block menu_content %}
+<div class="accordion" id="content_menu_accordion">
+
+    {% for group in research_groups %}
+        <div class="card">
+            <div class="card-header" id="card_header_{{ group.id }}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                            data-target="#collapse_{{ group.id }}" aria-expanded="false"
+                            aria-controls="collapse_{{ group.id }}" title="{{ group.description }}">
+                        {{ group.group_name }}
+                    </button>
+                </h2>
+            </div>
+
+            <div id="collapse_{{ group.id }}" class="collapse" aria-labelledby="card_header_{{ group.id }}"
+                 data-parent="#content_menu_accordion">
+                <div class="card-body">
+                    <ul class="nav flex-column">
+                        {% for research in group.researches.all %}
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{% url 'research-datasets' research.id %}" title="{{ research.description }}">
+                                    {{ research.research_name }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li class="nav-item">
+                                Нет исследований
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <ul class="nav flex-column">
+        {% for research in researches_without_group %}
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'research-datasets' research.id %}" title="{{ research.description }}">
+                    {{ research.research_name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock menu_content %}
+
+
+
+{% block content_layout %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Анализ данных</h1>
+</div>
+<div class="container text-center text-info">
+    <h2 class="h2">Выберите доступное исследование</h2>
+</div>
+{% endblock content_layout %}

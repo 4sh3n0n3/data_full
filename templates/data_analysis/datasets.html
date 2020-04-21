@@ -1,0 +1,80 @@
+{% extends 'data_analysis/researches.html' %}
+{% load static %}
+
+{% block content_layout %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Анализ данных</h1>
+</div>
+
+    {% for dataset in research_datasets %}
+
+        <div class="jumbotron bg-dark text-light">
+            <h1 class="h4">{{ dataset.name }}</h1>
+            <p class="text-info">
+                Создатель: <a href="#">{{ dataset.created_by }}</a>
+            </p>
+            <p class="text-info">
+                Владелец данных: <a href="#">{{ dataset.owner }}</a>
+            </p>
+
+
+
+            <div class="card">
+                <div class="card-header" id="dataset_header_{{ dataset.id }}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse"
+                                data-target="#dataset_collapse_{{ dataset.id }}" aria-expanded="false"
+                                aria-controls="dataset_collapse_{{ dataset.id }}">
+                            Показать данные
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="dataset_collapse_{{ dataset.id }}" class="collapse" aria-labelledby="dataset_header_{{ dataset.id }}"
+                     data-parent="#content_menu_accordion">
+                    <div class="card-body">
+                        <ul class="nav flex-column">
+                              <div class="table-responsive">
+                                <table class="table table-striped table-sm bg-light table-bordered">
+                                  <thead>
+                                    <tr>
+                                        <th style="white-space: nowrap; width: 1%;">Mongo id</th>
+                                          {% for header in dataset.headers %}
+                                                <th style="white-space: nowrap; width: 1%;">{{ header.name }}</th>
+                                          {% endfor %}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                  {% for entry in dataset.entries %}
+                                    <tr>
+                                        {% for val in entry.values %}
+                                            <td style="white-space: nowrap; width: 1%;">{{ val }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                  {% endfor %}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                            <h1 class="h4 text-center text-dark">. . .</h1>
+
+                        <p class="text-info">
+                            Показано первые {{ n_rows }} строк</a>
+                        </p>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="btn-toolbar mb-2 mb-md-0 justify-content-end" style="margin-top: 20px">
+                <form action="{% url 'calculate-data' dataset.id %}" method="get">
+                    <button class="btn btn-sm btn-primary" type="submit">Перейти к набору</button>
+                </form>
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+{% endblock content_layout %}

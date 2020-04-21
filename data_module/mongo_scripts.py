@@ -11,8 +11,8 @@ def insert_data(data, collection):
     return _get_database()[collection].insert_many(data).inserted_ids
 
 
-def find_data(collection, limit=0, filter_json=None):
-    return _get_database()[collection].find(filter=filter_json).limit(limit)
+def find_data(collection, limit=0, skip=0, filter_json=None, projection=None):
+    return _get_database()[collection].find(filter=filter_json, projection=projection).skip(skip).limit(limit)
 
 
 def count_data(collection, filter_json=None):

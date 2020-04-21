@@ -1,0 +1,276 @@
+{% extends 'data_analysis/analysis_base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="container jumbotron bg-dark text-light col-7 ">
+            <h1 class="h4 text-center">
+                Презентация: {{ dataset.name }}
+            </h1>
+
+            <div id="data_panel">
+                  <div class="table-responsive">
+                    <table class="table table-striped table-sm bg-light table-bordered">
+                      <thead>
+                        <tr>
+                            <th style="white-space: nowrap; width: 1%;">Mongo id</th>
+                            {% for header in headers %}
+                                <th style="white-space: nowrap; width: 1%;">
+                                    <button class="btn btn-sm btn-outline-primary" name="{{ header.custom_type.name }}" value="{{ header.id }}" onclick="applyData(this)">{{ header.name }}</button>
+                                    <button class="btn btn-sm btn-outline-secondary" name="{{ header.name }}" value="{{ header.id }}" onclick="markID(this)">Метка</button>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in entries %}
+                            <tr>
+                                {% for val in row.values %}
+                                    <td style="white-space: nowrap; width: 1%;">{{ val }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+            </div>
+
+            <div class="btn-toolbar mb-2 mb-md-0 justify-content-end" style="margin-top: 20px">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#analysisModal">
+                  Выбрать метод анализа
+                </button>
+            </div>
+        </div>
+
+
+        <div class="container col-4">
+            <div class="jumbotron bg-dark text-light">
+                <h1 class="h4 text-center">
+                    Выбраны для исследования
+                </h1>
+
+                <table class="table table-striped table-sm bg-light table-bordered">
+                  <thead>
+                    <tr>
+                        <th style="white-space: nowrap; width: 1%;">Колонки на исследование</th>
+                        <th style="white-space: nowrap; width: 1%;">Типы</th>
+                    </tr>
+                  </thead>
+                  <tbody id="selectedHeaders">
+                      <tr>
+
+                      </tr>
+                  </tbody>
+                </table>
+
+            </div>
+            <div class="jumbotron bg-dark text-light">
+                <h1 class="h4 text-center">
+                    Выбраны как метки
+                </h1>
+
+
+                <table class="table table-striped table-sm bg-light table-bordered">
+                  <thead>
+                    <tr>
+                        <th style="white-space: nowrap; width: 1%;">Метки</th>
+                    </tr>
+                  </thead>
+                  <tbody id="selectedLabels">
+                      <tr>
+
+                      </tr>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <form id="analysis_form" enctype="multipart/form-data" action="{% url 'calculate-data' dataset.id %}" method="post">
+        {% csrf_token %}
+
+        <!-- Modal -->
+        <div class="modal fade bd-example-modal-lg" id="analysisModal" tabindex="-1" role="dialog" aria-labelledby="analysisModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="analysisModalLabel">Методы анализа</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                    {{ form.calculation_keys }}
+                    {{ form.label_keys }}
+                    {{ form.analyser }}
+                    {{ form.params }}
+                    <div class="row" style="justify-content: center">
+                    {% for key, analyser in analysers.items %}
+                        <div class="jumbotron col-5" style="margin-left: 5px; margin-right: 5px">
+                            <h1 class="h4 text-center">
+                                {{ analyser.name }}
+                            </h1>
+
+                            <p class="text-info">
+                                {{ analyser.description }}
+                            </p>
+{#                            <button type="submit" class="btn btn-primary" name="{{ key }}" style="position: absolute; bottom: 10px" onclick="document.getElementById('analyser').value = JSON.stringify({'method':  this.name })">Отправить на исследование</button>#}
+                            <button type="button" class="btn btn-primary" style="position: absolute; bottom: 10px" data-toggle="modal" data-target="#paramsModal_{{ key }}">Выбрать</button>
+                        </div>
+
+                    {% endfor %}
+                    </div>
+              </div>
+              <div class="modal-footer">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% for key, analyser in analysers.items %}
+            <div class="modal fade bd-example-modal-lg" id="paramsModal_{{ key }}" tabindex="-1" role="dialog" aria-labelledby="paramsModalLabel_{{ key }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="analysisModalLabel">Параметры анализа</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        {% for param_key, param_values in analyser.params.items %}
+
+                            <div class="form-group">
+                                <label for="{{ key }}_{{ param_key }}">{{ param_values.label }}</label>
+
+                                {% if param_values.field_type == 'select' %}
+
+                                    <select class="form-control" name="{{ param_key }}" id="{{ key }}_{{ param_key }}">
+                                        {% for opt_key, opt_name in param_values.options.items %}
+                                            <option value="{{ opt_key }}">{{ opt_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+
+                                {% endif %}
+                            </div>
+
+                        {% endfor %}
+                    </div>
+
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary" name="{{ key }}" onclick="set_params('{{ key }}')">Отправить на исследование</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        {% endfor %}
+
+    </form>
+
+    <script>
+        var calculating_keys = {};
+        var label_keys = {};
+        var params = {};
+
+        var selector = document.getElementById('headerSelector');
+        var labels = document.getElementById('labels');
+        const tBody = document.getElementById('selectedHeaders');
+        const labelsTBody = document.getElementById('selectedLabels');
+
+        function applyData(event) {
+            let key = event.value;
+            if (calculating_keys[key] == null) {
+                calculating_keys[key] = event.innerText;
+
+                let tr = document.createElement("tr");
+                tr.id = "key_"+event.value;
+
+                let sheet = new CSSStyleSheet();
+                sheet.insertRule('#nowrap {white-space: nowrap; width: 1%;}', 0);
+
+                let td_btn = document.createElement("td");
+                td_btn.adoptedStyleSheets = [sheet];
+
+                let td_type = document.createElement("td");
+                td_type.adoptedStyleSheets = [sheet];
+                td_type.innerText = event.name;
+
+
+                let btn = document.createElement("button");
+                btn.className = "btn btn-sm btn-outline-danger";
+                btn.name = event.name;
+                btn.value = event.value;
+                btn.innerText = event.innerText;
+                btn.setAttribute( "onClick", "removeData(this);" );
+
+                td_btn.appendChild(btn);
+                tr.appendChild(td_btn);
+                tr.appendChild(td_type);
+                tBody.appendChild(tr);
+            }
+            selector.value =  JSON.stringify(calculating_keys);
+        }
+
+        function set_params(method_key) {
+            var list = document.getElementById("paramsModal_"+method_key).getElementsByClassName("form-control");
+            for (let item of list) {
+                params[item.name] = item.value;
+            }
+            document.getElementById('analyser').value = JSON.stringify({'method':  method_key });
+            document.getElementById('params').value = JSON.stringify(params);
+        }
+
+        function removeData(event) {
+            let key = event.value;
+            let tr_id = "key_"+key;
+            let tr = document.getElementById(tr_id);
+            tBody.removeChild(tr);
+            calculating_keys[key] = null;
+            selector.value =  JSON.stringify(calculating_keys);
+        }
+
+        function markID(event) {
+            let key = event.value;
+            if (label_keys[key] == null) {
+                label_keys[key] = event.name;
+
+                let tr = document.createElement("tr");
+                tr.id = "label_"+event.value;
+
+                let sheet = new CSSStyleSheet();
+                sheet.insertRule('#nowrap {white-space: nowrap; width: 1%;}', 0);
+
+                let td_btn = document.createElement("td");
+                td_btn.adoptedStyleSheets = [sheet];
+
+                let btn = document.createElement("button");
+                btn.className = "btn btn-sm btn-outline-danger";
+                btn.name = event.name;
+                btn.value = event.value;
+                btn.innerText = event.name;
+                btn.setAttribute( "onClick", "unmarkID(this);" );
+
+                td_btn.appendChild(btn);
+                tr.appendChild(td_btn);
+                labelsTBody.appendChild(tr);
+            }
+            labels.value =  JSON.stringify(label_keys);
+        }
+
+        function unmarkID(event) {
+            let key = event.value;
+            let tr_id = "label_"+key;
+            let tr = document.getElementById(tr_id);
+            labelsTBody.removeChild(tr);
+            label_keys[key] = null;
+            labels.value =  JSON.stringify(label_keys);
+        }
+    </script>
+
+{% endblock content %}

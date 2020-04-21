@@ -23,4 +23,5 @@ from . import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('data_manage/', include('data_management.urls')),
+    path('data_analysis/', include('data_analysis.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
