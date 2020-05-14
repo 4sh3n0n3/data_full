@@ -1,17 +1,25 @@
 import dask.dataframe
+import datetime
 from scipy.cluster.hierarchy import *
-from matplotlib import pyplot as plt
 
 
 def analyse_data(data_frame, params):
-    # varieties = []
-    # if labels is None:
-    #     varieties.append(frame.pop('_id'))
-    # else:
-    #     varieties.append(frame.pop(labels[0]))
-    mergings = linkage(data_frame, method=params['method'], metric=params['metric'])
+    now = datetime.datetime.now()
+    dist_matrix = linkage(data_frame, method=params['method'], metric=params['metric'])
+    print('скорость кластеризации O(n^2): ', datetime.datetime.now() - now)
+    context = {
+        'min_dist': min([dist[2] for dist in dist_matrix]),
+        'max_dist': max([dist[2] for dist in dist_matrix]),
+    }
 
-    # fig = plt.figure(figsize=(25, 10))
-    # dendrogram(mergings, truncate_mode='level')
-    # plt.show()
-    return mergings
+    if params['is_flattened'] == 'True':
+        flattened = fcluster(dist_matrix, t=float(params['threshold']), criterion=params['criterion'])
+        context.update({'is_flattened': True})
+        context.update({'num_of_clusters': max(flattened)})
+        context.update({'threshold': params['threshold']})
+        context.update({'criterion': params['criterion']})
+        return flattened, context
+    else:
+        context.update({'is_flattened': False})
+        context.update({'num_of_clusters': max([dist[1] for dist in dist_matrix])})
+        return dist_matrix, context

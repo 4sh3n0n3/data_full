@@ -8,7 +8,7 @@ from data_prod.settings import *
 from .forms import AnalysisForm
 
 # Create your views here.
-from django.views.generic import DetailView, ListView, CreateView, FormView
+from django.views.generic import DetailView, ListView, CreateView, FormView, RedirectView
 
 
 class ResearchListView(ListView):
@@ -49,17 +49,29 @@ class DatasetListView(ListView):
 #         return context
 
 
+class PreVisualisationRedirectView(RedirectView):
+    init_context = {}
+    template = ''
+    url = '/pre_visualise/'
+
+    def get(self, request, *args, **kwargs):
+        print(self.init_context)
+        print(self.template)
+        return render(request, self.template, self.init_context)
+
+
 class AnalyseData(View):
     form_class = AnalysisForm
     template_name = 'data_analysis/dataset_details.html'
 
     def get_context(self):
         dataset = Dataset.objects.get(id=self.kwargs['pk'])
-        context = {}
+        context = {
+            'analysers': ANALYSERS,
+            'form': AnalysisForm(),
+            'dataset': dataset,
+        }
         context.update(add_dataset_details(dataset, n_rows=18))
-        context.update({'analysers': ANALYSERS})
-        context.update({'form': AnalysisForm()})
-        context.update({'dataset': dataset})
         return context
 
     def get(self, request, *args, **kwargs):
@@ -70,12 +82,20 @@ class AnalyseData(View):
         if form.is_valid():
             dataset = Dataset.objects.get(id=self.kwargs['pk'])
 
-            headers_projection = {value: True for value in eval(request.POST['calculation_keys']).values()}
-            labels = {value: True for value in eval(request.POST['label_keys']).values()}
+            headers_projection = {value: True for value in eval(request.POST['calculation_keys']).values() if value != ''}
+            labels = {value: True for value in eval(request.POST['label_keys']).values() if value != ''}
             analyser = ANALYSERS.get(eval(request.POST['analyser']).get('method'))
             params = eval(request.POST['params'])
 
-            result = analyse(dataset, analyser, labels, projection=headers_projection, params=params)
-            return HttpResponseRedirect('/success/')
+            result, template_context, labels = analyse(dataset, analyser, labels, projection=headers_projection, params=params)
+
+            context = {
+                'result': result,
+                'template_context': template_context,
+                'labels': labels,
+            }
+            template = 'pre_visual_info_blocks/' + analyser.get('pre_visualisation_template')
+
+            return PreVisualisationRedirectView.as_view(init_context=context, template=template)(request)
 
         return render(request, self.template_name, self.get_context())

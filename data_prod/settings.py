@@ -53,6 +53,7 @@ ANALYSERS = {
         'description': 'Кластеризация данных по выбранным элементам, путем определения\n '
                        'их близости методом иерархической кластеризации',
         'module_name': 'hierarchical_clusterisation',
+        'pre_visualisation_template': 'hierarchy_clusterisation_pre_info.html',
         'params': {
             'method': {
                 'field_type': 'select',
@@ -75,6 +76,28 @@ ANALYSERS = {
                     'hamming': 'Метод Хэмминга',
                 }
             },
+            'is_flattened': {
+                'field_type': 'checkbox',
+                'label': 'Сгруппировать кластеры в плоскость',
+                'toggle': ['criterion', 'threshold'],
+                'default_value': False,
+            },
+            'criterion': {
+                'field_type': 'select',
+                'label': 'Критерий группировки',
+                'options': {
+                    'inconsistent': 'Критерий несовместимости',
+                    'distance': 'Критерий близости',
+                    'maxclust': 'Критерий максимального числа кластеров',
+                },
+                'hidden': True,
+            },
+            'threshold': {
+                'field_type': 'text',
+                'label': 'Значение критерия',
+                'hidden': True,
+                'default_value': 1.5,
+            }
         },
     },
     'k_means': {

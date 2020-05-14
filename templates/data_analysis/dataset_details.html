@@ -145,20 +145,43 @@
                     <div class="modal-body">
                         {% for param_key, param_values in analyser.params.items %}
 
-                            <div class="form-group">
-                                <label for="{{ key }}_{{ param_key }}">{{ param_values.label }}</label>
-
-                                {% if param_values.field_type == 'select' %}
-
+                            {% if param_values.field_type == 'select' %}
+                                <div class="form-group" id="{{ key }}_{{ param_key }}_group" {% if param_values.hidden %}hidden{% endif %} >
+                                    <label for="{{ key }}_{{ param_key }}">{{ param_values.label }}</label>
                                     <select class="form-control" name="{{ param_key }}" id="{{ key }}_{{ param_key }}">
                                         {% for opt_key, opt_name in param_values.options.items %}
                                             <option value="{{ opt_key }}">{{ opt_name }}</option>
                                         {% endfor %}
                                     </select>
-                                {% else %}
+                                </div>
+                            {% elif param_values.field_type == 'checkbox' %}
+                                <div class="form-check" id="{{ key }}_{{ param_key }}_group" {% if param_values.hidden %}hidden{% endif %} >
+                                  <input class="form-check-input" {% if param_values.default_value %}checked{% endif %} name="{{ param_key }}" type="checkbox" id="{{ key }}_{{ param_key }}">
+                                  <label class="form-check-label" for="{{ key }}_{{ param_key }}">
+                                      {{ param_values.label }}
+                                  </label>
+                                </div>
 
+                                {% if param_values.toggle is not None %}
+                                    {% for param_toggle_key in param_values.toggle %}
+                                        <script>
+                                            document.getElementById('{{ key }}_{{ param_key }}').addEventListener('change', function () {
+                                                if (this.checked) {
+                                                    document.getElementById('{{ key }}_{{ param_toggle_key }}_group').removeAttribute("hidden");
+                                                } else {
+                                                    document.getElementById('{{ key }}_{{ param_toggle_key }}_group').setAttribute("hidden", 'true');
+                                                }
+                                            });
+                                        </script>
+                                    {% endfor %}
                                 {% endif %}
-                            </div>
+
+                            {% elif param_values.field_type == 'text' %}
+                                <div class="form-group" id="{{ key }}_{{ param_key }}_group" {% if param_values.hidden %}hidden{% endif %}>
+                                    <label for="{{ key }}_{{ param_key }}">{{ param_values.label }}</label>
+                                    <input class="form-control" name="{{ param_key }}" id="{{ key }}_{{ param_key }}" value="{% if param_values.default_value is not None %}{{ param_values.default_value }}{% endif %}">
+                                </div>
+                            {% endif %}
 
                         {% endfor %}
                     </div>
@@ -185,7 +208,7 @@
 
         function applyData(event) {
             let key = event.value;
-            if (calculating_keys[key] == null) {
+            if (calculating_keys[key] == null || calculating_keys[key] == '') {
                 calculating_keys[key] = event.innerText;
 
                 let tr = document.createElement("tr");
@@ -222,6 +245,14 @@
             for (let item of list) {
                 params[item.name] = item.value;
             }
+            var checkboxes = document.getElementById("paramsModal_"+method_key).getElementsByClassName("form-check-input");
+            for (let item of checkboxes) {
+                if (item.checked) {
+                    params[item.name] = 'True';
+                } else {
+                    params[item.name] = 'False';
+                }
+            }
             document.getElementById('analyser').value = JSON.stringify({'method':  method_key });
             document.getElementById('params').value = JSON.stringify(params);
         }
@@ -231,13 +262,13 @@
             let tr_id = "key_"+key;
             let tr = document.getElementById(tr_id);
             tBody.removeChild(tr);
-            calculating_keys[key] = null;
+            calculating_keys[key] = '';
             selector.value =  JSON.stringify(calculating_keys);
         }
 
         function markID(event) {
             let key = event.value;
-            if (label_keys[key] == null) {
+            if (label_keys[key] == null || label_keys[key] == '') {
                 label_keys[key] = event.name;
 
                 let tr = document.createElement("tr");
@@ -268,7 +299,7 @@
             let tr_id = "label_"+key;
             let tr = document.getElementById(tr_id);
             labelsTBody.removeChild(tr);
-            label_keys[key] = null;
+            label_keys[key] = '';
             labels.value =  JSON.stringify(label_keys);
         }
     </script>
