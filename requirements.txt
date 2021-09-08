@@ -1,7 +1,7 @@
 scipy
 pymongo
 Django>=3.0.0
-Pillow==7.0.0
+Pillow==8.3.2
 dask==2.12.0
 django-crum
 pandas
